@@ -21,10 +21,22 @@ export const metadata: Metadata = {
   description:
     "Desain pakaian custom kamu sendiri dengan konfigurator 3D interaktif. Pilih warna, upload desain, dan lihat hasilnya secara real-time.",
   keywords: ["custom clothing", "3D configurator", "desain kaos", "pakaian custom"],
+  icons: {
+    icon: "/logo.webp",
+    apple: "/logo.webp",
+  },
   openGraph: {
     title: "LockerRoom — Custom Clothing Configurator",
     description: "Desain pakaian custom kamu sendiri dengan konfigurator 3D interaktif.",
     type: "website",
+    images: [
+      {
+        url: "/logo.webp",
+        width: 800,
+        height: 600,
+        alt: "LockerRoom Logo",
+      },
+    ],
   },
 };
 
