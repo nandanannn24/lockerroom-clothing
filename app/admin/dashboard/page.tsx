@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboardPage() {
   const orderCount = await prisma.order.count();
