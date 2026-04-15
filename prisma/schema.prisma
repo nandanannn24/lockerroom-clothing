@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Catalog of available clothing products
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  basePrice   Float
+  modelUrl    String   // Path to .glb file (e.g., "/models/tshirt.glb")
+  thumbnail   String?  // Preview image path
+  category    String   @default("tshirt")
+  sizes       String[] @default(["S", "M", "L", "XL", "XXL"])
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+/// Customer orders with customization details
+model Order {
+  id              String   @id @default(cuid())
+
+  // Customer information
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  customerAddress String
+
+  // Product reference
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+
+  // Customization data
+  selectedColor   String   // Hex color code (e.g., "#FF5733")
+  customImageUrl  String?  @db.Text // Base64 data URL or cloud storage URL
+  decalPositionX  Float    @default(0)
+  decalPositionY  Float    @default(0)
+  decalScale      Float    @default(1)
+  decalRotation   Float    @default(0)
+
+  // Order details
+  quantity        Int      @default(1)
+  size            String   @default("M")
+  totalPrice      Float
+  status          String   @default("pending") // pending, confirmed, production, shipped, delivered
+  notes           String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@index([customerEmail])
+}
