@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { EditPriceForm } from "./EditPriceForm";
 
 export default async function ProductsPage() {
