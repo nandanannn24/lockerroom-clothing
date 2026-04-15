@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useState } from "react";
 import { ColorPicker } from "@/components/configurator/ColorPicker";
 import { ImageUploader } from "@/components/configurator/ImageUploader";
 import { DecalControls } from "@/components/configurator/DecalControls";
@@ -39,6 +40,8 @@ function formatPrice(price: number) {
 }
 
 export default function ConfiguratorPage() {
+  const [showTools, setShowTools] = useState(true);
+  
   const productType = useConfigStore((s) => s.productType);
   const setProductType = useConfigStore((s) => s.setProductType);
   const selectedSize = useConfigStore((s) => s.selectedSize);
@@ -71,13 +74,25 @@ export default function ConfiguratorPage() {
       </div>
 
       {/* ── UI Overlay Wrapper (Responsive Mobile vs Desktop) ── */}
-      <div className="relative z-10 w-full h-[100dvh] pointer-events-none overflow-y-auto flex flex-col md:block hide-scrollbar">
+      <div className={`relative z-10 w-full h-[100dvh] pointer-events-none overflow-y-auto flex flex-col md:block hide-scrollbar ${showTools ? "" : "overflow-hidden"}`}>
 
-        {/* Spacer khusus di Mobile biar model 3D tetep kelihatan dan bisa diputer */}
-        <div className="min-h-[55vh] shrink-0 w-full md:hidden pointer-events-auto" />
+        {/* Tombol Toggle Tools (Hanya Mobile) */}
+        <button 
+          onClick={() => setShowTools(!showTools)}
+          className="fixed top-24 right-4 z-50 md:hidden w-12 h-12 bg-black/80 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center text-[#f5c518] shadow-lg pointer-events-auto transition-transform hover:scale-105 active:scale-95"
+        >
+          {showTools ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          )}
+        </button>
+
+        {/* Spacer khusus di Mobile biar model 3D tetep kelihatan dan bisa diputer - diubah ke none agar event sentuh tembus tembus ke Canvas */}
+        <div className="min-h-[55vh] shrink-0 w-full md:hidden pointer-events-none" />
 
         {/* Container Menu (Mobile: Scrollable Bottom Sheet | Desktop: Absolute Kiri Kanan) */}
-        <div className="flex flex-col gap-8 p-6 pt-10 bg-[#0a0a0a]/95 backdrop-blur-3xl border-t border-white/10 rounded-t-[2rem] pointer-events-auto md:bg-transparent md:border-none md:rounded-none md:p-0 md:block pb-12 md:pb-0 shadow-[0_-20px_50px_rgba(0,0,0,0.7)] md:shadow-none relative">
+        <div className={`flex flex-col gap-8 p-6 pt-10 bg-[#0a0a0a]/95 backdrop-blur-3xl border-t border-white/10 rounded-t-[2rem] pointer-events-auto md:bg-transparent md:border-none md:rounded-none md:p-0 md:block pb-12 md:pb-0 shadow-[0_-20px_50px_rgba(0,0,0,0.7)] md:shadow-none relative transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${showTools ? "translate-y-0" : "translate-y-[150%] md:translate-y-0"}`}>
 
           {/* Mobile Drawer Handle */}
           <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto absolute top-4 left-1/2 -translate-x-1/2 md:hidden" />
