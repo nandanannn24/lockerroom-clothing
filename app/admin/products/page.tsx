@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { EditPriceForm } from "./EditPriceForm";
+export const dynamic = 'force-dynamic';
 
 export default async function ProductsPage() {
   const products = await prisma.product.findMany({
