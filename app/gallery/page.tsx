@@ -1,46 +1,14 @@
 "use client";
 
-import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, Environment } from "@react-three/drei";
-import * as THREE from "three";
-
-function RotatingLogo() {
-  // Use suspense to load the model
-  const { scene } = useGLTF("/logo.glb");
-  const modelRef = useRef<THREE.Group>(null);
-
-  useFrame(() => {
-    if (modelRef.current) {
-      modelRef.current.rotation.y += 0.01;
-    }
-  });
-
-  return (
-    <group ref={modelRef} dispose={null} scale={2}>
-      <primitive object={scene} />
-    </group>
-  );
-}
-
 export default function GalleryPage() {
   // Generate gambar 1 to 33
   const images = Array.from({ length: 33 }, (_, i) => `/gallery/gambar${i + 1}.webp`);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-16 flex flex-col items-center">
-      {/* Header and 3D Decoration */}
+      {/* Header */}
       <div className="w-full flex flex-col items-center justify-center relative mb-16 px-4">
-        <div className="h-[300px] w-full max-w-md absolute top-0 left-1/2 -translate-x-1/2 opacity-40 pointer-events-none">
-          <Canvas camera={{ position: [0, 0, 8], fov: 45 }} gl={{ alpha: true }}>
-            <ambientLight intensity={1} />
-            <directionalLight position={[10, 10, 10]} intensity={2} />
-            <Environment preset="city" />
-            <RotatingLogo />
-          </Canvas>
-        </div>
-        
-        <h1 className="text-5xl md:text-7xl font-display font-bold text-white uppercase tracking-tight relative z-10 mt-32 text-center drop-shadow-2xl">
+        <h1 className="text-5xl md:text-7xl font-display font-bold text-white uppercase tracking-tight relative z-10 mt-12 text-center drop-shadow-2xl">
           ALL <span className="text-[#f5c518]">DESIGN</span>
         </h1>
         <p className="text-gray-400 mt-4 text-center max-w-lg relative z-10">
