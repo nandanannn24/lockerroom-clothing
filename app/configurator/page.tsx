@@ -52,7 +52,7 @@ export default function ConfiguratorPage() {
     }
     
     try {
-      // Delay ditambah jadi 800ms biar gambar ke-load utuh
+      // Delay 800ms biar gambar ke-load utuh
       await new Promise((resolve) => setTimeout(resolve, 800));
       const dataUrl = await toPng(node, { quality: 1, cacheBust: true, pixelRatio: 2, backgroundColor: '#1a1a1a' });
       
@@ -61,7 +61,14 @@ export default function ConfiguratorPage() {
       link.href = dataUrl;
       link.click();
       
-      window.open(`https://wa.me/${PHONE_NUMBER}?text=${waMessage}`, "_blank");
+      // FIX WA BLOKIR DI HP (SAFARI/CHROME MOBILE)
+      const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${waMessage}`;
+      if (/iPad|iPhone|iPod|Android/i.test(navigator.userAgent)) {
+        window.location.href = waUrl; // Pindah tab paksa kalo di HP
+      } else {
+        window.open(waUrl, "_blank"); // Buka tab baru kalo di PC
+      }
+
     } catch (err) {
       console.error("Error generating mockup image:", err);
       alert("Gagal memproses gambar. Pastikan gambar desain sudah dimuat sepenuhnya.");
@@ -118,8 +125,8 @@ export default function ConfiguratorPage() {
 
         <div className="min-h-[40vh] shrink-0 w-full md:hidden pointer-events-none" />
 
-        {/* Menu Containers */}
-        <div className={`flex flex-col gap-8 p-6 pt-10 bg-[#0a0a0a]/95 backdrop-blur-3xl border-t border-white/10 rounded-t-[2rem] pointer-events-auto md:bg-transparent md:border-none md:rounded-none md:p-0 md:block pb-12 md:pb-0 shadow-[0_-20px_50px_rgba(0,0,0,0.7)] md:shadow-none relative transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${showTools ? "translate-y-0" : "translate-y-[150%] md:translate-y-0"}`}>
+        {/* Menu Containers -> pb-40 di baris ini yang nylametin scroll HP lu */}
+        <div className={`flex flex-col gap-8 p-6 pt-10 bg-[#0a0a0a]/95 backdrop-blur-3xl border-t border-white/10 rounded-t-[2rem] pointer-events-auto md:bg-transparent md:border-none md:rounded-none md:p-0 md:block pb-40 md:pb-0 shadow-[0_-20px_50px_rgba(0,0,0,0.7)] md:shadow-none relative transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${showTools ? "translate-y-0" : "translate-y-[150%] md:translate-y-0"}`}>
 
           <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto absolute top-4 left-1/2 -translate-x-1/2 md:hidden" />
 
