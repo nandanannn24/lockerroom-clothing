@@ -8,8 +8,10 @@ const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
 export function ImageUploader() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const decalImage = useConfigStore((s) => s.decalImage);
-  const setDecalImage = useConfigStore((s) => s.setDecalImage);
+  
+  const { activeSide, decals, updateDecal } = useConfigStore();
+  const currentDecalImage = decals[activeSide].image;
+
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,13 +28,13 @@ export function ImageUploader() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
-      setDecalImage(result);
+      updateDecal(activeSide, { image: result, x: 0, y: 0, scale: 1, rotation: 0 }); // reset layout
     };
     reader.onerror = () => {
       setError("Gagal membaca file.");
     };
     reader.readAsDataURL(file);
-  }, [setDecalImage]);
+  }, [activeSide, updateDecal]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -57,10 +59,10 @@ export function ImageUploader() {
   }, [processFile]);
 
   const handleRemove = useCallback(() => {
-    setDecalImage(null);
+    updateDecal(activeSide, { image: null });
     setError(null);
     if (inputRef.current) inputRef.current.value = "";
-  }, [setDecalImage]);
+  }, [activeSide, updateDecal]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -72,7 +74,7 @@ export function ImageUploader() {
         className="hidden"
       />
 
-      {!decalImage ? (
+      {!currentDecalImage ? (
         <div
           className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
             isDragging ? "border-[#f5c518] bg-[#f5c518]/10" : "border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10"
@@ -87,13 +89,13 @@ export function ImageUploader() {
             <polyline points="17,8 12,3 7,8" />
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
-          <p className="text-sm font-medium text-white mb-1">Upload desain base/logo</p>
-          <p className="text-[10px] text-gray-500 uppercase tracking-widest">PNG, JPG • Maks 5MB</p>
+          <p className="text-sm font-medium text-white mb-1">Upload desain bagian ini</p>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest">PNG, JPG transparan • Maks 5MB</p>
         </div>
       ) : (
         <div className="relative aspect-video rounded-xl border border-white/20 bg-black/50 overflow-hidden group">
           <img
-            src={decalImage}
+            src={currentDecalImage}
             alt="Custom design preview"
             className="w-full h-full object-contain p-2"
           />
