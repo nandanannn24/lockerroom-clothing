@@ -43,7 +43,6 @@ export default function ConfiguratorPage() {
 
   const handleCheckout = async () => {
     setIsProcessing(true);
-    // Target the visually hidden dual component logic securely placed at the very end of this document.
     const node = document.getElementById("dual-canvas-capture");
     
     if (!node) {
@@ -52,7 +51,6 @@ export default function ConfiguratorPage() {
     }
     
     try {
-      // Delay 800ms biar gambar ke-load utuh
       await new Promise((resolve) => setTimeout(resolve, 800));
       const dataUrl = await toPng(node, { quality: 1, cacheBust: true, pixelRatio: 2, backgroundColor: '#1a1a1a' });
       
@@ -61,12 +59,11 @@ export default function ConfiguratorPage() {
       link.href = dataUrl;
       link.click();
       
-      // FIX WA BLOKIR DI HP (SAFARI/CHROME MOBILE)
       const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${waMessage}`;
       if (/iPad|iPhone|iPod|Android/i.test(navigator.userAgent)) {
-        window.location.href = waUrl; // Pindah tab paksa kalo di HP
+        window.location.href = waUrl; 
       } else {
-        window.open(waUrl, "_blank"); // Buka tab baru kalo di PC
+        window.open(waUrl, "_blank"); 
       }
 
     } catch (err) {
@@ -81,40 +78,44 @@ export default function ConfiguratorPage() {
   const availableModels = PRODUCTS_2D.filter(p => p.category === selectedCategory);
 
   return (
-    <div className="relative w-full h-[100dvh] overflow-hidden bg-[#0a0a0a] pt-24" id="configurator-page">
+    // FIX UTAMA: Pake 'fixed inset-0 z-40' buat ngunci layar jadi ala aplikasi Native, kga bocor ke Footer!
+    <div className="fixed inset-0 z-40 w-full h-[100dvh] overflow-hidden bg-[#0a0a0a] pt-24" id="configurator-page">
 
-      {/* ── 2D Canvas Layer ── */}
-      <div className="absolute inset-0 z-0 pointer-events-auto h-[100dvh] pb-[60vh] md:pb-0 flex flex-col justify-center">
-        {/* Toggle Front Back */}
-        <div className="absolute top-28 left-1/2 -translate-x-1/2 z-20 flex bg-white/10 p-1 border border-white/15 rounded-full backdrop-blur-md">
-          <button
-            onClick={() => setActiveSide("front")}
-            className={`px-6 py-2 text-sm font-semibold rounded-full transition-all ${
-              activeSide === "front" ? "bg-[#f5c518] text-black shadow-lg" : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Depan
-          </button>
-          <button
-            onClick={() => setActiveSide("back")}
-            className={`px-6 py-2 text-sm font-semibold rounded-full transition-all ${
-              activeSide === "back" ? "bg-[#f5c518] text-black shadow-lg" : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Belakang
-          </button>
-        </div>
-
-        <MockupCanvas />   {/* Standard active view dependency */}
+      {/* ── 2D Canvas Layer (Di-lock di belakang layar) ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none h-[100dvh] pb-[60vh] md:pb-0 flex flex-col justify-center">
+        <MockupCanvas />
       </div>
 
-      {/* ── UI Overlay Wrapper ── */}
-      <div className={`relative z-10 w-full h-full pointer-events-none overflow-y-auto flex flex-col md:block hide-scrollbar ${showTools ? "" : "overflow-hidden"}`}>
+      {/* ── TOGGLE FRONT/BACK (Ditaruh di z-50 biar bisa diklik di atas semua layer) ── */}
+      <div className="absolute top-28 left-1/2 -translate-x-1/2 z-50 flex bg-white/10 p-1 border border-white/15 rounded-full backdrop-blur-md shadow-2xl">
+        <button
+          onClick={() => setActiveSide("front")}
+          className={`px-6 py-2 text-sm font-semibold rounded-full transition-all ${
+            activeSide === "front" ? "bg-[#f5c518] text-black shadow-lg" : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Depan
+        </button>
+        <button
+          onClick={() => setActiveSide("back")}
+          className={`px-6 py-2 text-sm font-semibold rounded-full transition-all ${
+            activeSide === "back" ? "bg-[#f5c518] text-black shadow-lg" : "text-gray-400 hover:text-white"
+          }`}
+        >
+          Belakang
+        </button>
+      </div>
+
+      {/* ── UI Overlay Wrapper (Sekarang bebas di-scroll) ── */}
+      <div 
+        className={`relative z-10 w-full h-full overflow-y-auto flex flex-col md:block hide-scrollbar ${showTools ? "" : "overflow-hidden"}`}
+        style={{ WebkitOverflowScrolling: 'touch' }} // FIX IOS SCROLL SMOOTH
+      >
 
         {/* Mobile Tools Toggle */}
         <button 
           onClick={() => setShowTools(!showTools)}
-          className="fixed top-28 right-4 z-50 md:hidden w-12 h-12 bg-black/80 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center text-[#f5c518] shadow-lg pointer-events-auto transition-transform hover:scale-105 active:scale-95"
+          className="fixed top-28 right-4 z-50 md:hidden w-12 h-12 bg-black/80 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center text-[#f5c518] shadow-lg transition-transform hover:scale-105 active:scale-95"
         >
           {showTools ? (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -123,10 +124,11 @@ export default function ConfiguratorPage() {
           )}
         </button>
 
-        <div className="min-h-[40vh] shrink-0 w-full md:hidden pointer-events-none" />
+        {/* Jarak Spacer biar Menu ada di bawah (Bisa buat scroll-area juga!) */}
+        <div className="min-h-[45vh] shrink-0 w-full md:hidden" />
 
-        {/* Menu Containers -> pb-40 di baris ini yang nylametin scroll HP lu */}
-        <div className={`flex flex-col gap-8 p-6 pt-10 bg-[#0a0a0a]/95 backdrop-blur-3xl border-t border-white/10 rounded-t-[2rem] pointer-events-auto md:bg-transparent md:border-none md:rounded-none md:p-0 md:block pb-40 md:pb-0 shadow-[0_-20px_50px_rgba(0,0,0,0.7)] md:shadow-none relative transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${showTools ? "translate-y-0" : "translate-y-[150%] md:translate-y-0"}`}>
+        {/* Menu Containers -> pb-40 aman jaya sentosa */}
+        <div className={`flex flex-col gap-8 p-6 pt-10 bg-[#0a0a0a]/95 backdrop-blur-3xl border-t border-white/10 rounded-t-[2rem] md:bg-transparent md:border-none md:rounded-none md:p-0 md:block pb-40 md:pb-0 shadow-[0_-20px_50px_rgba(0,0,0,0.7)] md:shadow-none relative transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${showTools ? "translate-y-0" : "translate-y-[150%] md:translate-y-0"}`}>
 
           <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto absolute top-4 left-1/2 -translate-x-1/2 md:hidden" />
 
