@@ -43,15 +43,12 @@ export function MockupCanvas({ forcedSide, hideBackground = false, overrideSize 
         {/* ── MOCKUP CONTAINER ── */}
         <div className="relative w-full aspect-[3/4] flex items-center justify-center bg-[#1a1a1a] rounded-3xl overflow-hidden shadow-2xl">
 
-          {/* LAYER 1: BASE T-SHIRT IMAGE */}
-          <div 
-            className="absolute inset-0 z-0 pointer-events-none"
-            style={{
-              backgroundImage: `url('${imageSrc}')`,
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
+          {/* LAYER 1: BASE T-SHIRT IMAGE (Pakai tag img biar di-render sama html-to-image) */}
+          <img 
+            src={imageSrc} 
+            alt="Base Model" 
+            crossOrigin="anonymous"
+            className="absolute inset-0 w-full h-full object-contain z-0 pointer-events-none"
           />
 
           {/* LAYER 2: COLOR OVERLAY (Multiply + Masked) */}
@@ -85,6 +82,7 @@ export function MockupCanvas({ forcedSide, hideBackground = false, overrideSize 
               <img 
                 src={currentDecal.image} 
                 alt="Custom Decal" 
+                crossOrigin="anonymous"
                 className="max-w-[200px] h-auto object-contain drop-shadow-2xl" 
                 style={{ 
                   filter: 'contrast(1.05) brightness(1.02)' 
