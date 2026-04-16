@@ -40,23 +40,27 @@ export function MockupCanvas({ forcedSide, hideBackground = false, overrideSize 
 
       <div className={`relative flex items-center justify-center transition-all duration-500 ease-out ${containerSizingClass}`}>
         
-        {/* ── MOCKUP CONTAINER ── */}
+                {/* ── MOCKUP CONTAINER ── */}
         <div className="relative w-full aspect-[3/4] flex items-center justify-center bg-[#1a1a1a] rounded-3xl overflow-hidden shadow-2xl">
 
-          {/* LAYER 1: BASE T-SHIRT IMAGE (Pakai tag img biar di-render sama html-to-image) */}
+          {/* EFEK LAMPU SOROT ATAS (CSS PURE MAGIC) */}
+          <div className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-[200%] h-[80%] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.25)_0%,transparent_60%)] pointer-events-none z-20 mix-blend-overlay" />
+
+          {/* LAYER 1: BASE T-SHIRT IMAGE */}
           <img 
             src={imageSrc} 
             alt="Base Model" 
             crossOrigin="anonymous"
-            className="absolute inset-0 w-full h-full object-contain z-0 pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain z-0 pointer-events-none drop-shadow-2xl"
           />
 
-          {/* LAYER 2: COLOR OVERLAY (Multiply + Masked) */}
+          {/* LAYER 2: COLOR OVERLAY (Multiply + Masked + Opacity biar kga nguwejreng) */}
           <div 
             className="absolute inset-0 z-10 transition-colors duration-300 pointer-events-none"
             style={{
               backgroundColor: meshColor,
               mixBlendMode: "multiply",
+              opacity: 0.85, /* INI OBAT BIAR WARNANYA AGAK PUYEH / KALEM */
               WebkitMaskImage: `url('${imageSrc}')`,
               WebkitMaskSize: "contain",
               WebkitMaskPosition: "center",
@@ -68,7 +72,7 @@ export function MockupCanvas({ forcedSide, hideBackground = false, overrideSize 
             }}
           />
 
-          {/* LAYER 4: CUSTOM DECAL (Manual positioning, NO DRAG) */}
+          {/* LAYER 4: CUSTOM DECAL */}
           {currentDecal.image && (
             <div 
               className="absolute z-30 pointer-events-none"
