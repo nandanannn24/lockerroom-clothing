@@ -70,8 +70,8 @@ export default async function OrdersPage() {
                     Rp {order.totalPrice.toLocaleString("id-ID")}
                   </td>
                   <td style={{ padding: "1.2rem 1.5rem" }}>
-                    <span style={{ 
-                      padding: "0.3rem 0.6rem", 
+                    <span style={{
+                      padding: "0.3rem 0.6rem",
                       background: order.status === "pending" ? "rgba(245, 197, 24, 0.15)" : "rgba(34, 197, 94, 0.15)",
                       color: order.status === "pending" ? "var(--gold)" : "#4ade80",
                       borderRadius: "4px",

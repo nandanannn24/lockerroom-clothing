@@ -42,8 +42,8 @@ export default async function ProductsPage() {
                     <EditPriceForm productId={product.id} currentPrice={product.basePrice} />
                   </td>
                   <td style={{ padding: "1.2rem 1.5rem" }}>
-                    <span style={{ 
-                      padding: "0.3rem 0.6rem", 
+                    <span style={{
+                      padding: "0.3rem 0.6rem",
                       background: product.isActive ? "rgba(34, 197, 94, 0.15)" : "rgba(239, 68, 68, 0.15)",
                       color: product.isActive ? "#4ade80" : "#f87171",
                       borderRadius: "4px",

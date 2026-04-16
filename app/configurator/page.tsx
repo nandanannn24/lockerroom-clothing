@@ -52,7 +52,7 @@ export default function ConfiguratorPage() {
     }
     
     try {
-      const dataUrl = await toPng(node, { quality: 1, backgroundColor: "#0a0a0a" });
+      const dataUrl = await toPng(node, { quality: 1, cacheBust: true, backgroundColor: "#111111" });
       
       const link = document.createElement("a");
       link.download = `LockerRoom_Dual_Checkout_${currentProduct.label.replace(/\s+/g, "_")}.png`;
@@ -276,8 +276,8 @@ export default function ConfiguratorPage() {
 
       {/* ── OFF-SCREEN RENDERING DUAL CANVAS (FOR EXPORT ONLY) ── */}
       <div 
-        className="absolute top-[-9999px] left-[-9999px] flex shrink-0 items-center justify-between p-20 gap-20 overflow-hidden" 
-        style={{ width: "2400px", height: "1200px", backgroundColor: "#0a0a0a" }} 
+        className="fixed top-[200vh] left-0 flex shrink-0 items-center justify-between p-20 gap-20 overflow-hidden pointer-events-none z-[-50] bg-[#111111]" 
+        style={{ width: "2400px", height: "1200px" }} 
         id="dual-canvas-capture"
       >
         <MockupCanvas forcedSide="front" hideBackground={true} />

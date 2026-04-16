@@ -40,13 +40,25 @@ export function MockupCanvas({ forcedSide, hideBackground = false }: MockupCanva
       <div className={`relative flex items-center justify-center transition-all duration-500 ease-out ${containerSizingClass}`}>
         
         {/* ── MOCKUP CONTAINER ── */}
-        <div className="relative w-full aspect-[3/4] flex items-center justify-center">
+        <div className="relative w-full aspect-[3/4] flex items-center justify-center bg-[#1a1a1a] rounded-3xl overflow-hidden shadow-2xl">
 
-          {/* LAYER 1: BASE COLOR (Masked precisely to shirt shape) */}
+          {/* LAYER 1: BASE T-SHIRT IMAGE */}
           <div 
-            className="absolute inset-0 z-0 transition-colors duration-300"
+            className="absolute inset-0 z-0 pointer-events-none"
+            style={{
+              backgroundImage: `url('${imageSrc}')`,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
+
+          {/* LAYER 2: COLOR OVERLAY (Multiply + Masked) */}
+          <div 
+            className="absolute inset-0 z-10 transition-colors duration-300 pointer-events-none"
             style={{
               backgroundColor: meshColor,
+              mixBlendMode: "multiply",
               WebkitMaskImage: `url('${imageSrc}')`,
               WebkitMaskSize: "contain",
               WebkitMaskPosition: "center",
@@ -55,30 +67,6 @@ export function MockupCanvas({ forcedSide, hideBackground = false }: MockupCanva
               maskSize: "contain",
               maskPosition: "center",
               maskRepeat: "no-repeat"
-            }}
-          />
-
-          {/* LAYER 2: SHADOWS/TEXTURE OVERLAY (Multiply blend mode) */}
-          <div 
-            className="absolute inset-0 z-10 pointer-events-none"
-            style={{
-              backgroundImage: `url('${imageSrc}')`,
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              mixBlendMode: "multiply",
-              opacity: 0.95
-            }}
-          />
-
-          {/* LAYER 3: HIGHLIGHTS/SHEEN (Screen/Lighten for ultra realism - optional enhancement) */}
-          <div 
-            className="absolute inset-0 z-20 pointer-events-none opacity-30 mix-blend-screen"
-            style={{
-              backgroundImage: `url('${imageSrc}')`,
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
             }}
           />
 
