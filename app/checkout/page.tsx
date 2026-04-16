@@ -1,11 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useConfigStore } from "@/lib/store";
+import { useConfigStore, PRODUCTS_2D } from "@/lib/store";
 import { GlassCard } from "@/components/ui/GlassCard";
 
-const PRICES = { tshirt: 149000, hoodie: 249000 };
-const LABELS = { tshirt: "Kaos / T-Shirt", hoodie: "Hoodie" };
 const PHONE_NUMBER = "6282144749764";
 
 function formatPrice(price: number) {
@@ -18,24 +16,26 @@ function formatPrice(price: number) {
 
 export default function CheckoutPage() {
   const {
-    productType,
+    selectedModel,
     meshColor,
-    decalImage,
+    decals,
     selectedSize,
     quantity,
   } = useConfigStore();
 
-  const unitPrice = PRICES[productType];
+  const currentProduct = PRODUCTS_2D.find((p) => p.id === selectedModel) || PRODUCTS_2D[0];
+  const unitPrice = currentProduct.price;
   const totalPrice = unitPrice * quantity;
+  const hasDecal = decals.front.image || decals.back.image;
 
   const waMessage = encodeURIComponent(
     `Halo LockerRoom! Saya ingin memesan:\n\n` +
-    `🛒 Produk: ${LABELS[productType]}\n` +
+    `🛒 Produk: ${currentProduct.label}\n` +
     `🎨 Warna: ${meshColor}\n` +
     `📐 Ukuran: ${selectedSize}\n` +
     `🔢 Jumlah: ${quantity}\n` +
     `💰 Total: ${formatPrice(totalPrice)}\n` +
-    `🖼️ Desain Custom: ${decalImage ? "Ya (terlampir)" : "Tidak"}\n\n` +
+    `🖼️ Desain Custom: ${hasDecal ? "Ya (terlampir)" : "Tidak"}\n\n` +
     `Mohon konfirmasi ketersediaan. Terima kasih!`
   );
 
@@ -60,7 +60,7 @@ export default function CheckoutPage() {
 
           <div className="summary-row">
             <span className="summary-label">Produk</span>
-            <span className="summary-value">{LABELS[productType]}</span>
+            <span className="summary-value">{currentProduct.label}</span>
           </div>
           <div className="summary-row">
             <span className="summary-label">Warna</span>
@@ -72,7 +72,7 @@ export default function CheckoutPage() {
           <div className="summary-row">
             <span className="summary-label">Desain Custom</span>
             <span className="summary-value">
-              {decalImage ? "✓ Diunggah" : "Tidak ada"}
+              {hasDecal ? "✓ Ada" : "Tidak ada"}
             </span>
           </div>
           <div className="summary-row">
@@ -123,7 +123,7 @@ export default function CheckoutPage() {
           </h3>
           <ul style={{ fontSize: "0.85rem", color: "#a0a0a0", listStyle: "none", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             <li>✅ Setelah klik WhatsApp, pesan otomatis terisi detail pesananmu</li>
-            <li>✅ Jika ada desain custom, kirimkan file gambar asli via chat</li>
+            <li>✅ Jika ada desain custom, kirimkan file mockup yang sudah terdownload otomatis.</li>
             <li>✅ Admin akan mengkonfirmasi ketersediaan dan estimasi pengerjaan</li>
             <li>✅ Pembayaran dilakukan setelah konfirmasi dari admin</li>
           </ul>
