@@ -1,8 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { MapSection } from "@/components/ui/MapSection";
 import { useState, useEffect } from "react";
+
+// Use dynamic import for ProcessScene to avoid SSR issues with 3D
+const ProcessScene = dynamic(() => import("@/components/three/ProcessScene"), {
+  ssr: false,
+});
 
 const PHONE_NUMBER = "6282144749764";
 const PHONE_DISPLAY = "0821-4474-9764";
@@ -33,7 +39,7 @@ export default function HomePage() {
   return (
     <>
       {/* ══════════ HERO ══════════ */}
-      <section className="hero" id="hero-section">
+      <section className="hero pt-24" id="hero-section">
         {/* Static Background instead of 3D Scene */}
         <div className="hero-canvas-bg bg-black">
           <img 
@@ -101,15 +107,11 @@ export default function HomePage() {
               KETELETIAN DALAM SETIAP JAHITAN
             </h2>
             <p className="text-gray-400 text-sm md:text-base leading-relaxed">
-              Dari pemintalan benang kualitas tertinggi hingga teknik sablon terpresisi. Menggunakan alat kalibrasi warna terkini untuk memastikan desainmu diterjemahkan sempurna dari kanvas digital ke material fisik yang premium.
+              Dari pemintalan benang kualitas tertinggi hingga teknik sablon terpresisi. Menggunakan alat kalibrasi warna terkini untuk memastikan desainmu diterjemahkan sempurna ke material fisik yang premium.
             </p>
           </div>
-          <div className="w-full md:w-[500px] h-[350px] md:h-[450px] flex justify-center items-center shrink-0">
-            <img 
-              src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=2069&auto=format&fit=crop" 
-              className="w-full h-full object-cover rounded-3xl shadow-xl border border-white/10 grayscale-[50%]" 
-              alt="Our process setup" 
-            />
+          <div className="w-full md:w-[500px] h-[400px] md:h-[500px] flex justify-center items-center shrink-0">
+             <ProcessScene />
           </div>
         </div>
       </section>

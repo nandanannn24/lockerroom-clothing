@@ -1,72 +1,70 @@
 "use client";
 
-import { useGLTF, Float, Environment, OrbitControls, Center } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
+import { useGLTF, Environment, OrbitControls, Center } from "@react-three/drei";
 import { Suspense, useEffect } from "react";
 import * as THREE from "three";
 
-// ─── Floating Logo Model ────────────────────────────────────────────
-// Loads logo.glb and paints it LockerRoom Gold.
-// Rotation is handled by OrbitControls autoRotate, NOT useFrame.
-
 function LogoModel() {
-  const gltf = useGLTF("/logo.glb");
-  const scene = gltf.scene;
+  const { scene } = useGLTF("/logo.glb");
 
-  // Paint every mesh gold
   useEffect(() => {
-    scene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        const mat = mesh.material as THREE.MeshStandardMaterial;
-        if (mat && mat.color) {
-          mat.color.set("#FFD700");
-          mat.metalness = 0.4;
-          mat.roughness = 0.3;
-          mat.needsUpdate = true;
+    if (scene) {
+      scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: "#f5c518",
+            roughness: 0.3,
+            metalness: 0.7
+          });
         }
-      }
-    });
+      });
+    }
   }, [scene]);
 
   return (
-    <Float speed={1.5} rotationIntensity={0.3} floatIntensity={1}>
+    <group scale={1.5}>
       <Center>
-        <primitive object={scene} scale={[2.8, 2.8, 2.8]} dispose={null} />
+        <primitive object={scene} />
       </Center>
-    </Float>
+    </group>
   );
 }
 
-try {
-  useGLTF.preload("/logo.glb");
-} catch {}
+function Loader() {
+  return (
+    <mesh>
+      <boxGeometry args={[0.5, 0.5, 0.5]} />
+      <meshStandardMaterial color="#f5c518" wireframe />
+    </mesh>
+  );
+}
 
 export default function ProcessScene() {
   return (
-    <div className="w-full h-[400px] md:h-[500px] flex items-center justify-center relative">
+    <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
       <Canvas
-        camera={{ position: [0, 0, 7], fov: 50 }}
-        gl={{ antialias: true, alpha: true }}
-        className="w-full h-full"
+        shadows
+        camera={{ position: [0, 0, 5], fov: 45 }}
+        gl={{ preserveDrawingBuffer: false, antialias: true, alpha: true }}
       >
-        <Suspense fallback={null}>
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[5, 5, 5]} intensity={1.2} color="#f5c518" />
-          <directionalLight position={[-5, -5, -5]} intensity={0.4} color="#ffffff" />
-        
-        <LogoModel />
-
-        <Environment preset="city" />
-      </Suspense>
-
-        <OrbitControls
-          autoRotate
-          autoRotateSpeed={1}
-          enableZoom={false}
-          enablePan={false}
-        />
+        <Suspense fallback={<Loader />}>
+          <ambientLight intensity={1} />
+          <directionalLight position={[10, 10, 10]} intensity={2} />
+          <Environment preset="city" />
+          <LogoModel />
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            autoRotate
+            autoRotateSpeed={2}
+            minPolarAngle={Math.PI / 4}
+            maxPolarAngle={Math.PI / 1.5}
+          />
+        </Suspense>
       </Canvas>
+      {/* Interaction Hint */}
     </div>
   );
 }
