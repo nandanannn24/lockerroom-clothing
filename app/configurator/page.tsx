@@ -1,35 +1,15 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useState } from "react";
+import { toPng } from "html-to-image";
 import { ColorPicker } from "@/components/configurator/ColorPicker";
 import { ImageUploader } from "@/components/configurator/ImageUploader";
 import { DecalControls } from "@/components/configurator/DecalControls";
-import { useConfigStore } from "@/lib/store";
-import type { ProductType } from "@/lib/store";
-
-// ── Dynamic import the 3D scene (no SSR) ──
-const Scene = dynamic(() => import("@/components/three/Scene"), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#0a0a0a] z-0">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f5c518" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="animate-spin">
-        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-      </svg>
-      <span className="text-gray-400 text-xs tracking-[0.2em] uppercase">
-        Loading Studio...
-      </span>
-    </div>
-  ),
-});
+import { MockupCanvas } from "@/components/configurator/MockupCanvas";
+import { useConfigStore, PRODUCTS_2D } from "@/lib/store";
 
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 const PHONE_NUMBER = "6282144749764";
-
-const PRODUCTS: { type: ProductType; label: string; price: number }[] = [
-  { type: "tshirt", label: "Kaos / T-Shirt", price: 149000 },
-  { type: "hoodie", label: "Hoodie", price: 249000 },
-];
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -42,35 +22,72 @@ function formatPrice(price: number) {
 export default function ConfiguratorPage() {
   const [showTools, setShowTools] = useState(true);
   
-  const productType = useConfigStore((s) => s.productType);
-  const setProductType = useConfigStore((s) => s.setProductType);
-  const selectedSize = useConfigStore((s) => s.selectedSize);
-  const setSelectedSize = useConfigStore((s) => s.setSelectedSize);
-  const quantity = useConfigStore((s) => s.quantity);
-  const setQuantity = useConfigStore((s) => s.setQuantity);
-  const meshColor = useConfigStore((s) => s.meshColor);
-  const decalImage = useConfigStore((s) => s.decalImage);
+  const { 
+    selectedModel, setSelectedModel, 
+    meshColor, 
+    activeSide, setActiveSide,
+    selectedSize, setSelectedSize, 
+    quantity, setQuantity,
+    decals
+  } = useConfigStore();
 
-  const currentProduct = PRODUCTS.find((p) => p.type === productType)!;
+  const currentProduct = PRODUCTS_2D.find((p) => p.id === selectedModel) || PRODUCTS_2D[0];
   const totalPrice = currentProduct.price * quantity;
+  const hasDecal = decals.front.image || decals.back.image;
 
   const waMessage = encodeURIComponent(
-    `Halo LockerRoom! Saya ingin memesan:\n\n` +
-    `🛒 Produk: ${currentProduct.label}\n` +
-    `🎨 Warna: ${meshColor}\n` +
-    `📐 Ukuran: ${selectedSize}\n` +
-    `🔢 Jumlah: ${quantity}\n` +
-    `💰 Total: ${formatPrice(totalPrice)}\n` +
-    `🖼️ Desain Custom: ${decalImage ? "Ya" : "Tidak"}\n\n` +
-    `Mohon konfirmasi ketersediaan.`
+    `Halo min! Saya sudah membuat kaos ${currentProduct.label} ukuran ${selectedSize} warna ${meshColor}. ` +
+    `Harga: ${formatPrice(totalPrice)}. ` +
+    `Gambar hasil editan sudah saya download dan akan saya kirimkan di chat ini. Apakah bisa dibuatkan sekarang?`
   );
+
+  const handleCheckout = async () => {
+    const node = document.getElementById("mockup-canvas-capture");
+    if (!node) return;
+    
+    try {
+      const dataUrl = await toPng(node, { quality: 1, backgroundColor: "#0a0a0a" });
+      
+      // Auto-download image
+      const link = document.createElement("a");
+      link.download = `LockerRoom_Design_${currentProduct.label.replace(/\s+/g, "_")}.png`;
+      link.href = dataUrl;
+      link.click();
+      
+      // Redirect to WhatsApp
+      window.open(`https://wa.me/${PHONE_NUMBER}?text=${waMessage}`, "_blank");
+    } catch (err) {
+      console.error("Error generating mockup image:", err);
+      alert("Gagal memproses gambar. Pastikan gambar desain sudah dimuat sepenuhnya.");
+    }
+  };
 
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden bg-[#0a0a0a]" id="configurator-page">
 
-      {/* ── 3D Canvas (Ditetapkan di background) ── */}
-      <div className="absolute inset-0 z-0 animate-fade-in pointer-events-auto">
-        <Scene />
+      {/* ── 2D Canvas Layer ── */}
+      <div className="absolute inset-0 z-0 animate-fade-in pointer-events-auto h-[100dvh] pb-[60vh] md:pb-0 flex flex-col justify-center">
+        {/* Toggle Front Back (Desktop: Top Center, Mobile: Top bounds) */}
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20 flex bg-white/10 p-1 border border-white/15 rounded-full backdrop-blur-md">
+          <button
+            onClick={() => setActiveSide("front")}
+            className={`px-6 py-2 text-sm font-semibold rounded-full transition-all ${
+              activeSide === "front" ? "bg-[#f5c518] text-black shadow-lg" : "text-gray-400 hover:text-white"
+            }`}
+          >
+            Depan
+          </button>
+          <button
+            onClick={() => setActiveSide("back")}
+            className={`px-6 py-2 text-sm font-semibold rounded-full transition-all ${
+              activeSide === "back" ? "bg-[#f5c518] text-black shadow-lg" : "text-gray-400 hover:text-white"
+            }`}
+          >
+            Belakang
+          </button>
+        </div>
+
+        <MockupCanvas />
       </div>
 
       {/* ── UI Overlay Wrapper (Responsive Mobile vs Desktop) ── */}
@@ -88,8 +105,8 @@ export default function ConfiguratorPage() {
           )}
         </button>
 
-        {/* Spacer khusus di Mobile biar model 3D tetep kelihatan dan bisa diputer - diubah ke none agar event sentuh tembus tembus ke Canvas */}
-        <div className="min-h-[55vh] shrink-0 w-full md:hidden pointer-events-none" />
+        {/* Spacer khusus di Mobile biar model tetep kelihatan */}
+        <div className="min-h-[45vh] shrink-0 w-full md:hidden pointer-events-none" />
 
         {/* Container Menu (Mobile: Scrollable Bottom Sheet | Desktop: Absolute Kiri Kanan) */}
         <div className={`flex flex-col gap-8 p-6 pt-10 bg-[#0a0a0a]/95 backdrop-blur-3xl border-t border-white/10 rounded-t-[2rem] pointer-events-auto md:bg-transparent md:border-none md:rounded-none md:p-0 md:block pb-12 md:pb-0 shadow-[0_-20px_50px_rgba(0,0,0,0.7)] md:shadow-none relative transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${showTools ? "translate-y-0" : "translate-y-[150%] md:translate-y-0"}`}>
@@ -98,7 +115,7 @@ export default function ConfiguratorPage() {
           <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto absolute top-4 left-1/2 -translate-x-1/2 md:hidden" />
 
           {/* ── Left Panel ── */}
-          <div className="w-full flex flex-col gap-6 md:absolute md:left-8 md:top-[110px] md:w-[340px] md:max-h-[calc(100vh-140px)] md:overflow-y-auto hide-scrollbar md:bg-black/70 md:backdrop-blur-2xl md:border md:border-white/10 md:rounded-[2rem] md:p-7 md:shadow-[0_0_40px_rgba(0,0,0,0.8)] animate-slide-right">
+          <div className="w-full flex flex-col gap-6 md:absolute md:left-8 md:top-[110px] md:w-[340px] md:max-h-[calc(100vh-140px)] md:overflow-y-auto hide-scrollbar md:bg-[rgba(15,15,15,0.7)] md:backdrop-blur-2xl md:border md:border-white/10 md:rounded-[2rem] md:p-7 md:shadow-[0_0_40px_rgba(0,0,0,0.8)] animate-slide-right">
 
             {/* Pilih Produk */}
             <div className="flex flex-col gap-4">
@@ -106,17 +123,17 @@ export default function ConfiguratorPage() {
                 <span className="w-3 h-3 rounded-full border-2 border-[#f5c518] flex items-center justify-center">
                   <span className="w-1 h-1 bg-[#f5c518] rounded-full"></span>
                 </span>
-                Katalog
+                Model Pakaian
               </h2>
-              <div className="flex flex-col gap-2">
-                {PRODUCTS.map((p) => (
+              <div className="grid grid-cols-2 gap-2">
+                {PRODUCTS_2D.map((p) => (
                   <button
-                    key={p.type}
-                    className={`py-3 px-4 rounded-xl text-sm font-medium border text-left transition-all duration-300 ${productType === p.type
+                    key={p.id}
+                    className={`py-3 px-3 rounded-xl text-xs font-semibold border text-center transition-all duration-300 ${selectedModel === p.id
                         ? "bg-[#f5c518] text-black border-[#f5c518] shadow-[0_0_15px_rgba(245,197,24,0.15)]"
                         : "border-white/5 bg-white/5 text-gray-400 hover:bg-white/10 hover:border-white/20 hover:text-white"
                       }`}
-                    onClick={() => setProductType(p.type)}
+                    onClick={() => setSelectedModel(p.id)}
                   >
                     {p.label}
                   </button>
@@ -132,7 +149,7 @@ export default function ConfiguratorPage() {
                 <span className="w-3 h-3 rounded-full border-2 border-[#f5c518] flex items-center justify-center">
                   <span className="w-1 h-1 bg-[#f5c518] rounded-full"></span>
                 </span>
-                Warna
+                Warna Dasar
               </h2>
               <ColorPicker />
             </div>
@@ -142,7 +159,7 @@ export default function ConfiguratorPage() {
           <div className="w-full h-[1px] bg-white/10 md:hidden" />
 
           {/* ── Right Panel ── */}
-          <div className="w-full flex flex-col gap-6 md:absolute md:right-8 md:top-[110px] md:w-[340px] md:max-h-[calc(100vh-140px)] md:overflow-y-auto hide-scrollbar md:bg-black/70 md:backdrop-blur-2xl md:border md:border-white/10 md:rounded-[2rem] md:p-7 md:shadow-[0_0_40px_rgba(0,0,0,0.8)] animate-slide-left">
+          <div className="w-full flex flex-col gap-6 md:absolute md:right-8 md:top-[110px] md:w-[340px] md:max-h-[calc(100vh-140px)] md:overflow-y-auto hide-scrollbar md:bg-[rgba(15,15,15,0.7)] md:backdrop-blur-2xl md:border md:border-white/10 md:rounded-[2rem] md:p-7 md:shadow-[0_0_40px_rgba(0,0,0,0.8)] animate-slide-left">
 
             {/* Custom Artwork */}
             <div className="flex flex-col gap-4">
@@ -150,7 +167,7 @@ export default function ConfiguratorPage() {
                 <span className="w-3 h-3 rounded-full border-2 border-[#f5c518] flex items-center justify-center">
                   <span className="w-1 h-1 bg-[#f5c518] rounded-full"></span>
                 </span>
-                Artwork
+                Artwork {activeSide === 'front' ? '(Depan)' : '(Belakang)'}
               </h2>
               <ImageUploader />
               <DecalControls />
@@ -209,14 +226,12 @@ export default function ConfiguratorPage() {
                 <span className="text-xl font-bold text-white tracking-tight">{formatPrice(totalPrice)}</span>
               </div>
 
-              <a
-                href={`https://wa.me/${PHONE_NUMBER}?text=${waMessage}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={handleCheckout}
                 className="w-full bg-[#f5c518] text-black text-sm font-bold uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ffd84d] transition-all duration-300 shadow-[0_4px_20px_rgba(245,197,24,0.25)] hover:-translate-y-1"
               >
-                Checkout via WhatsApp
-              </a>
+                Simpan & Checkout (WA)
+              </button>
             </div>
 
           </div>
