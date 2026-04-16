@@ -287,9 +287,9 @@ export default function ConfiguratorPage() {
 
       {/* ── OFF-SCREEN RENDERING DUAL CANVAS (FOR EXPORT ONLY) ── */}
       <div 
-        className="fixed top-0 left-0 -z-50 flex flex-row items-center justify-center gap-12 bg-[#1a1a1a] p-12 w-[1200px] h-[800px]" 
-        id="dual-canvas-capture"
-      >
+  className="fixed top-0 -left-[9999px] -z-[9999] pointer-events-none flex flex-row items-center justify-center gap-12 bg-[#1a1a1a] p-12 w-[1200px] h-[800px]" 
+  id="dual-canvas-capture"
+>
         <MockupCanvas forcedSide="front" hideBackground={true} overrideSize="w-[500px] h-[600px]" />
         
         {/* Ornamen Pemisah */}
