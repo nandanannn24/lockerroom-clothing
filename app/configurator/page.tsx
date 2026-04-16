@@ -52,7 +52,8 @@ export default function ConfiguratorPage() {
     }
     
     try {
-      const dataUrl = await toPng(node, { quality: 1, cacheBust: true, backgroundColor: "#111111" });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const dataUrl = await toPng(node, { quality: 1, cacheBust: true, useCORS: true, pixelRatio: 2, backgroundColor: '#1a1a1a' });
       
       const link = document.createElement("a");
       link.download = `LockerRoom_Dual_Checkout_${currentProduct.label.replace(/\s+/g, "_")}.png`;
@@ -276,16 +277,15 @@ export default function ConfiguratorPage() {
 
       {/* ── OFF-SCREEN RENDERING DUAL CANVAS (FOR EXPORT ONLY) ── */}
       <div 
-        className="fixed top-[200vh] left-0 flex shrink-0 items-center justify-between p-20 gap-20 overflow-hidden pointer-events-none z-[-50] bg-[#111111]" 
-        style={{ width: "2400px", height: "1200px" }} 
+        className="fixed top-0 left-0 -z-[9999] opacity-0 pointer-events-none flex flex-row items-center justify-center gap-12 bg-[#1a1a1a] p-12 w-[1200px] h-[800px]" 
         id="dual-canvas-capture"
       >
-        <MockupCanvas forcedSide="front" hideBackground={true} />
+        <MockupCanvas forcedSide="front" hideBackground={true} overrideSize="w-[500px] h-[600px]" />
         
         {/* Ornamen Pemisah */}
         <div className="w-[2px] h-[80%] bg-[#f5c518]/20 flex shrink-0 mx-8"></div>
         
-        <MockupCanvas forcedSide="back" hideBackground={true} />
+        <MockupCanvas forcedSide="back" hideBackground={true} overrideSize="w-[500px] h-[600px]" />
         
         {/* Background Ambient Shared (Tengah) */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[90%] blur-[200px] opacity-15 pointer-events-none rounded-full" style={{ backgroundColor: meshColor }}></div>

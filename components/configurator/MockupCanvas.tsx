@@ -5,9 +5,10 @@ import { useConfigStore, PRODUCTS_2D } from "@/lib/store";
 interface MockupCanvasProps {
   forcedSide?: "front" | "back";
   hideBackground?: boolean;
+  overrideSize?: string;
 }
 
-export function MockupCanvas({ forcedSide, hideBackground = false }: MockupCanvasProps) {
+export function MockupCanvas({ forcedSide, hideBackground = false, overrideSize }: MockupCanvasProps) {
   const { selectedModel, activeSide: globalActiveSide, meshColor, decals } = useConfigStore();
   
   const currentSide = forcedSide || globalActiveSide;
@@ -17,7 +18,7 @@ export function MockupCanvas({ forcedSide, hideBackground = false }: MockupCanva
 
   // Specific dynamic sizing to accommodate large models
   const isLargeModel = selectedModel === "hoodie-boxy" || selectedModel === "reguler-panjang" || selectedModel === "hoodie-regular";
-  const containerSizingClass = isLargeModel ? "w-full max-w-[550px]" : "w-full max-w-[400px]";
+  const containerSizingClass = overrideSize || (isLargeModel ? "w-full max-w-[550px]" : "w-full max-w-[400px]");
 
   return (
     <div className={`w-full h-full flex flex-col items-center justify-center relative touch-none ${hideBackground ? 'bg-transparent' : ''}`}>
