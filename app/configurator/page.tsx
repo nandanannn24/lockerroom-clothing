@@ -53,7 +53,7 @@ export default function ConfiguratorPage() {
     
     try {
       await new Promise((resolve) => setTimeout(resolve, 300));
-      const dataUrl = await toPng(node, { quality: 1, cacheBust: true, useCORS: true, pixelRatio: 2, backgroundColor: '#1a1a1a' });
+      const dataUrl = await toPng(node, { quality: 1, cacheBust: true, pixelRatio: 2, backgroundColor: '#1a1a1a' });
       
       const link = document.createElement("a");
       link.download = `LockerRoom_Dual_Checkout_${currentProduct.label.replace(/\s+/g, "_")}.png`;
