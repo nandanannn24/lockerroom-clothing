@@ -52,7 +52,8 @@ export default function ConfiguratorPage() {
     }
     
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      // Delay ditambah jadi 800ms biar gambar ke-load utuh
+      await new Promise((resolve) => setTimeout(resolve, 800));
       const dataUrl = await toPng(node, { quality: 1, cacheBust: true, pixelRatio: 2, backgroundColor: '#1a1a1a' });
       
       const link = document.createElement("a");
@@ -277,7 +278,7 @@ export default function ConfiguratorPage() {
 
       {/* ── OFF-SCREEN RENDERING DUAL CANVAS (FOR EXPORT ONLY) ── */}
       <div 
-        className="fixed top-0 left-0 -z-[9999] opacity-0 pointer-events-none flex flex-row items-center justify-center gap-12 bg-[#1a1a1a] p-12 w-[1200px] h-[800px]" 
+        className="fixed top-0 left-0 -z-50 flex flex-row items-center justify-center gap-12 bg-[#1a1a1a] p-12 w-[1200px] h-[800px]" 
         id="dual-canvas-capture"
       >
         <MockupCanvas forcedSide="front" hideBackground={true} overrideSize="w-[500px] h-[600px]" />
