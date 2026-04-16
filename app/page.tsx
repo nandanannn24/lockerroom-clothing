@@ -1,28 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { MapSection } from "@/components/ui/MapSection";
 import { useState, useEffect } from "react";
-
-// ─── Dynamic imports ────────────────────────────────────────────────
-const HeroScene = dynamic(() => import("@/components/three/HeroScene"), {
-  ssr: false,
-  loading: () => (
-    <div className="hero-loading">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "spin 1.5s linear infinite" }}>
-        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-      </svg>
-      <span style={{ color: "var(--text-secondary)", fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase" }}>
-        Loading Studio...
-      </span>
-    </div>
-  ),
-});
-
-const ProcessScene = dynamic(() => import("@/components/three/ProcessScene"), {
-  ssr: false,
-});
 
 const PHONE_NUMBER = "6282144749764";
 const PHONE_DISPLAY = "0821-4474-9764";
@@ -54,9 +34,13 @@ export default function HomePage() {
     <>
       {/* ══════════ HERO ══════════ */}
       <section className="hero" id="hero-section">
-        {/* Full-screen 3D Background */}
-        <div className="hero-canvas-bg">
-          <HeroScene />
+        {/* Static Background instead of 3D Scene */}
+        <div className="hero-canvas-bg bg-black">
+          <img 
+            src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2070&auto=format&fit=crop" 
+            className="w-full h-full object-cover opacity-20 mix-blend-luminosity" 
+            alt="Hero background" 
+          />
         </div>
         <div className="hero-overlay" />
 
@@ -74,8 +58,8 @@ export default function HomePage() {
           </h1>
 
           <p className="hero-subtitle">
-            Buat desain kaos dan hoodie custom dengan konfigurator 3D interaktif.
-            Pilih warna, upload logo, dan lihat hasilnya secara real-time.
+            Buat desain kaos dan hoodie custom dengan konfigurator 2D interaktif mutakhir.
+            Pilih warna, letakkan artwork Anda, dan lihat hasilnya secara real-time.
           </p>
 
           <div className="hero-actions">
@@ -110,18 +94,22 @@ export default function HomePage() {
 
       {/* ══════════ OUR PROCESS ══════════ */}
       <section className="relative py-32 bg-[#0a0a0a] w-full flex justify-center overflow-hidden border-y border-white/5" id="our-process">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 px-6 w-full">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 px-6 w-full max-w-7xl mx-auto">
           <div className="relative z-10 bg-black/40 backdrop-blur-lg p-10 rounded-2xl border border-white/10 shadow-2xl w-full md:w-[450px] shrink-0">
             <p className="text-[#f5c518] text-xs font-bold uppercase tracking-[0.3em] mb-4">Our Process</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-6 leading-tight">
               KETELETIAN DALAM SETIAP JAHITAN
             </h2>
             <p className="text-gray-400 text-sm md:text-base leading-relaxed">
-              Dari pemintalan benang kualitas tertinggi hingga teknik sablon terpresisi. Menggunakan alat kalibrasi warna terkini untuk memastikan desainmu diterjemahkan sempurna dari kanvas digital 3D ke material fisik yang premium.
+              Dari pemintalan benang kualitas tertinggi hingga teknik sablon terpresisi. Menggunakan alat kalibrasi warna terkini untuk memastikan desainmu diterjemahkan sempurna dari kanvas digital ke material fisik yang premium.
             </p>
           </div>
-          <div className="w-full md:w-[450px] h-[400px] md:h-[500px] flex justify-center items-center shrink-0">
-            <ProcessScene />
+          <div className="w-full md:w-[500px] h-[350px] md:h-[450px] flex justify-center items-center shrink-0">
+            <img 
+              src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=2069&auto=format&fit=crop" 
+              className="w-full h-full object-cover rounded-3xl shadow-xl border border-white/10 grayscale-[50%]" 
+              alt="Our process setup" 
+            />
           </div>
         </div>
       </section>
@@ -201,14 +189,11 @@ export default function HomePage() {
         className="w-full bg-[#0a0a0a] px-4 md:px-6 flex justify-center border-b border-white/5 relative z-10"
         style={{ paddingTop: "120px", paddingBottom: "120px" }}
       >
-        {/* flex-row buat paksa nyamping di mobile, w-full, gap dikecilin kalo di HP */}
         <div className="flex flex-row justify-center items-stretch w-full gap-3 md:gap-16 max-w-5xl mx-auto">
 
           {/* Kartu Alamat Studio */}
-          {/* w-1/2 biar di HP kebagi rata 50% 50%, padding dikecilin */}
           <div className="bg-[#111] border border-white/10 rounded-2xl p-4 md:p-12 flex flex-col items-center justify-center text-center gap-2 md:gap-6 shadow-2xl w-1/2 max-w-[420px]">
             <div className="text-[#f5c518] shrink-0 flex items-center justify-center">
-              {/* Icon ngecil di HP */}
               <svg className="w-6 h-6 md:w-9 md:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                 <circle cx="12" cy="10" r="3" />
@@ -216,7 +201,6 @@ export default function HomePage() {
             </div>
             <div className="flex flex-col items-center justify-center w-full">
               <h3 className="text-gray-400 text-[9px] md:text-sm font-bold uppercase tracking-widest md:tracking-[0.2em] mb-1 md:mb-4">Alamat Studio</h3>
-              {/* Teks alamat disingkat sikit di HP pake leading-tight biar kga penuh */}
               <p className="text-white text-[10px] md:text-[15px] font-medium leading-tight md:leading-relaxed text-center">
                 RT.006/RW.003, Beringin, Jiken, Kec. Tulangan, Kab. Sidoarjo
               </p>
@@ -232,7 +216,6 @@ export default function HomePage() {
             </div>
             <div className="flex flex-col items-center justify-center w-full gap-1 md:gap-2">
               <h3 className="text-gray-400 text-[9px] md:text-sm font-bold uppercase tracking-widest md:tracking-[0.2em] mb-1 md:mb-4">Hubungi Kami</h3>
-              {/* Font nomer dibikin xs di HP biar muat kga nabrak */}
               <p className="text-white text-xs md:text-3xl font-bold tracking-wider text-center">{PHONE_DISPLAY}</p>
             </div>
           </div>
