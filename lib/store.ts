@@ -1,29 +1,43 @@
 import { create } from "zustand";
 
-// ─── 3D Configurator State ──────────────────────────────────────────
+export interface DecalState {
+  image: string | null;
+  x: number;
+  y: number;
+  scale: number;
+  rotation: number;
+}
 
-export type ProductType = "tshirt" | "hoodie";
+export const PRODUCTS_2D = [
+  { id: "boxy", label: "Boxy", price: 159000, front: "/new-model/boxy-depan.webp", back: "/new-model/boxy-belakang.webp" },
+  { id: "crop", label: "Crop", price: 139000, front: "/new-model/crop-depan.webp", back: "/new-model/crop-belakang.webp" },
+  { id: "hoodie-boxy", label: "Hoodie Boxy", price: 259000, front: "/new-model/hoodie-boxy-depan.webp", back: "/new-model/hoodie-boxy-belakang.webp" },
+  { id: "hoodie-regular", label: "Hoodie Regular", price: 249000, front: "/new-model/hoodie-regular-depan.webp", back: "/new-model/hoodie-regular-belakang.webp" },
+  { id: "oversize", label: "Oversize", price: 169000, front: "/new-model/oversize-depan.webp", back: "/new-model/oversize-belakang.webp" },
+  { id: "polo", label: "Polo", price: 189000, front: "/new-model/polo-depan.webp", back: "/new-model/polo-belakang.webp" },
+  { id: "reguler", label: "Reguler", price: 149000, front: "/new-model/reguler-depan.webp", back: "/new-model/reguler-belakang.webp" },
+  { id: "reguler-panjang", label: "Reguler Lengan Panjang", price: 169000, front: "/new-model/reguler-depan-panjang.webp", back: "/new-model/reguler-belakang-panjang.webp" },
+];
 
 export interface ConfiguratorState {
   // ── Product type ──
-  productType: ProductType;
-  setProductType: (type: ProductType) => void;
+  selectedModel: string;
+  setSelectedModel: (id: string) => void;
 
   // ── Mesh color ──
   meshColor: string;
   setMeshColor: (color: string) => void;
 
-  // ── Decal image ──
-  decalImage: string | null;
-  setDecalImage: (img: string | null) => void;
+  // ── View Side ──
+  activeSide: "front" | "back";
+  setActiveSide: (side: "front" | "back") => void;
 
-  // ── Decal transforms ──
-  decalPosition: [number, number];
-  setDecalPosition: (pos: [number, number]) => void;
-  decalScale: number;
-  setDecalScale: (scale: number) => void;
-  decalRotation: number;
-  setDecalRotation: (rot: number) => void;
+  // ── Decals ──
+  decals: {
+    front: DecalState;
+    back: DecalState;
+  };
+  updateDecal: (side: "front" | "back", updates: Partial<DecalState>) => void;
 
   // ── Product options ──
   selectedSize: string;
@@ -35,13 +49,22 @@ export interface ConfiguratorState {
   resetConfig: () => void;
 }
 
+const initialDecalState: DecalState = {
+  image: null,
+  x: 0,
+  y: 0,
+  scale: 1, // 1 is default scale in framer-motion typically
+  rotation: 0,
+};
+
 const initialState = {
-  productType: "tshirt" as ProductType,
-  meshColor: "#1a1a1a",
-  decalImage: null,
-  decalPosition: [0, 0.05] as [number, number],
-  decalScale: 0.15,
-  decalRotation: 0,
+  selectedModel: "boxy",
+  meshColor: "#ffffff",
+  activeSide: "front" as const,
+  decals: {
+    front: { ...initialDecalState },
+    back: { ...initialDecalState },
+  },
   selectedSize: "M",
   quantity: 1,
 };
@@ -49,12 +72,18 @@ const initialState = {
 export const useConfigStore = create<ConfiguratorState>((set) => ({
   ...initialState,
 
-  setProductType: (type) => set({ productType: type }),
+  setSelectedModel: (id) => set({ selectedModel: id }),
   setMeshColor: (color) => set({ meshColor: color }),
-  setDecalImage: (img) => set({ decalImage: img }),
-  setDecalPosition: (pos) => set({ decalPosition: pos }),
-  setDecalScale: (scale) => set({ decalScale: scale }),
-  setDecalRotation: (rot) => set({ decalRotation: rot }),
+  setActiveSide: (side) => set({ activeSide: side }),
+  
+  updateDecal: (side, updates) =>
+    set((state) => ({
+      decals: {
+        ...state.decals,
+        [side]: { ...state.decals[side], ...updates },
+      },
+    })),
+
   setSelectedSize: (size) => set({ selectedSize: size }),
   setQuantity: (qty) => set({ quantity: Math.max(1, qty) }),
   resetConfig: () => set(initialState),
